@@ -77,7 +77,7 @@ def generate_ideas(
     client,
     model,
     skip_generation=False,
-    max_num_generations=20,
+    max_num_generations=1,
     num_reflections=5,
 ):
     if skip_generation:
@@ -362,7 +362,7 @@ def check_idea_novelty(
     base_dir,
     client,
     model,
-    max_num_iterations=10,
+    max_num_iterations=5,
 ):
     with open(osp.join(base_dir, "experiment.py"), "r") as f:
         code = f.read()
@@ -447,7 +447,7 @@ def check_idea_novelty(
 
 
 if __name__ == "__main__":
-    MAX_NUM_GENERATIONS = 32
+    MAX_NUM_GENERATIONS = 1
     NUM_REFLECTIONS = 5
     import argparse
 
