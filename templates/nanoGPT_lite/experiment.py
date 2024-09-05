@@ -348,13 +348,13 @@ def train(dataset="shakespeare_char", out_dir="run_0", seed_offset=0):
     # DDP settings
     backend = "nccl"  # 'nccl', 'gloo', etc.
     # system
-    device = "cuda"  # Always use CUDA
+    device = "cpu"  # Always use CUDA
     dtype = (
         "bfloat16"
         if torch.cuda.is_available() and torch.cuda.is_bf16_supported()
         else "float16"
     )  # 'float32', 'bfloat16', or 'float16', the latter will auto implement a GradScaler
-    compile = True  # do not torch compile the model on macbooks
+    compile = False  # do not torch compile the model on macbooks
 
     # various inits, derived attributes, I/O setup
     # if not ddp, we are running on a single gpu, and one process
