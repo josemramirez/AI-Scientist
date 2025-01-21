@@ -78,8 +78,8 @@ def generate_ideas(
         client,
         model,
         skip_generation=False,
-        max_num_generations=20,
-        num_reflections=5,
+        max_num_generations=2,
+        num_reflections=2,
 ):
     if skip_generation:
         # Load existing ideas from file
@@ -180,8 +180,8 @@ def generate_next_idea(
         client,
         model,
         prev_idea_archive=[],
-        num_reflections=5,
-        max_attempts=10,
+        num_reflections=3,
+        max_attempts=4,
 ):
     idea_archive = prev_idea_archive
     original_archive_size = len(idea_archive)
