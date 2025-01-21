@@ -282,6 +282,8 @@ def on_backoff(details):
 @backoff.on_exception(
     backoff.expo, requests.exceptions.HTTPError, on_backoff=on_backoff
 )
+
+'''
 def search_for_papers(query, result_limit=10, engine="semanticscholar") -> Union[None, List[Dict]]:
     if not query:
         return None
@@ -305,6 +307,7 @@ def search_for_papers(query, result_limit=10, engine="semanticscholar") -> Union
         time.sleep(1.0)
         if not total:
             return None
+'''
 
         papers = results["data"]
         return papers
@@ -493,8 +496,8 @@ def check_idea_novelty(
 
 
 if __name__ == "__main__":
-    MAX_NUM_GENERATIONS = 32
-    NUM_REFLECTIONS = 5
+    MAX_NUM_GENERATIONS = 1
+    NUM_REFLECTIONS = 2
     import argparse
 
     parser = argparse.ArgumentParser(description="Generate AI scientist ideas")
