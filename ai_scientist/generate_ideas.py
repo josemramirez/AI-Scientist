@@ -287,31 +287,7 @@ def on_backoff(details):
 def search_for_papers(query, result_limit=10, engine="openalex") -> Union[None, List[Dict]]:
     if not query:
         return None
-    if engine == "semanticscholar":
-        rsp = requests.get(
-            "https://api.semanticscholar.org/graph/v1/paper/search",
-            headers={"X-API-KEY": S2_API_KEY} if S2_API_KEY else {},
-            params={
-                "query": query,
-                "limit": result_limit,
-                "fields": "title,authors,venue,year,abstract,citationStyles,citationCount",
-            },
-        )
-        print(f"Response Status Code: {rsp.status_code}")
-        print(
-            f"Response Content: {rsp.text[:500]}"
-        )  # Print the first 500 characters of the response content
-        rsp.raise_for_status()
-        results = rsp.json()
-        total = results["total"]
-        time.sleep(1.0)
-        if not total:
-            return None
-                
-
-        papers = results["data"]
-        return papers
-    elif engine == "openalex":
+    if engine == "openalex":
         import pyalex
         from pyalex import Work, Works
         mail = os.environ.get("OPENALEX_MAIL_ADDRESS", None)
