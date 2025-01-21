@@ -411,7 +411,7 @@ def check_idea_novelty(
         client,
         model,
         max_num_iterations=10,
-        engine="semanticscholar",
+        engine="openalex",
 ):
     with open(osp.join(base_dir, "experiment.py"), "r") as f:
         code = f.read()
