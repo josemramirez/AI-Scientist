@@ -283,8 +283,8 @@ def on_backoff(details):
     backoff.expo, requests.exceptions.HTTPError, on_backoff=on_backoff
 )
 
-'''
-def search_for_papers(query, result_limit=10, engine="semanticscholar") -> Union[None, List[Dict]]:
+
+def search_for_papers(query, result_limit=10, engine="openalex") -> Union[None, List[Dict]]:
     if not query:
         return None
     if engine == "semanticscholar":
@@ -307,7 +307,7 @@ def search_for_papers(query, result_limit=10, engine="semanticscholar") -> Union
         time.sleep(1.0)
         if not total:
             return None
-'''
+                
 
         papers = results["data"]
         return papers
