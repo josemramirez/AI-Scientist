@@ -19,7 +19,7 @@ from ai_scientist.perform_experiments import perform_experiments
 from ai_scientist.perform_review import perform_review, load_paper, perform_improvement
 from ai_scientist.perform_writeup import perform_writeup, generate_latex
 
-NUM_REFLECTIONS = 3
+NUM_REFLECTIONS = 5
 
 
 def print_time():
@@ -79,13 +79,13 @@ def parse_arguments():
     parser.add_argument(
         "--num-ideas",
         type=int,
-        default=50,
+        default=1,
         help="Number of ideas to generate",
     )
     parser.add_argument(
         "--engine",
         type=str,
-        default="semanticscholar",
+        default="openalex",
         choices=["semanticscholar", "openalex"],
         help="Scholar engine to use.",
     )
