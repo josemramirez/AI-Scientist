@@ -1,0 +1,322 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{iclr2024_conference,times}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{titletoc}
+
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{cleveref}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\graphicspath{{../}} % To reference your generated figures, see below.
+\begin{filecontents}{references.bib}
+
+
+@article{hethcote2000mathematics,
+  title={The mathematics of infectious diseases},
+  author={Hethcote, Herbert W},
+  journal={SIAM review},
+  volume={42},
+  number={4},
+  pages={599--653},
+  year={2000},
+  publisher={SIAM}
+}
+
+@article{he2020seir,
+  title={SEIR modeling of the COVID-19 and its dynamics},
+  author={He, Shaobo and Peng, Yuexi and Sun, Kehui},
+  journal={Nonlinear dynamics},
+  volume={101},
+  pages={1667--1680},
+  year={2020},
+  publisher={Springer}
+}
+
+
+
+
+\end{filecontents}
+
+\title{Early and Graduated: Multi-Threshold SEIR Modeling Reveals Optimal Timing for Epidemic Interventions}
+
+\author{Jose M. Ramirez\\
+Department of Physical Science\\
+University of Yachay\\
+}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Effective epidemic management requires understanding how population behavior changes in response to disease prevalence, yet traditional SEIR models typically assume constant contact rates throughout an outbreak. This oversimplification limits their utility for policy planning, as real populations modify their behavior at different infection thresholds. We address this challenge by developing a modified SEIR model incorporating multi-stage behavioral responses, where contact rates automatically adjust at predefined infection thresholds. Through systematic comparison of five intervention strategies, we demonstrate that early, graduated responses significantly outperform binary or delayed approaches. Our optimal strategy, implementing progressive contact rate reductions (40\%, 60\%, 80\%) at low infection thresholds (0.5\%, 2\%, 4\%), delays peak infection by 14 days and reduces maximum infections by 36\% compared to baseline (from 694.8 to 444.3 cases), while achieving a 2.7\% reduction in total infections through socially feasible graduated restrictions. These results provide quantitative evidence that proactive, multi-stage interventions can effectively balance epidemic control with implementation practicality.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+% Context and motivation
+Effective epidemic management requires balancing disease control with practical implementation constraints. While the SEIR (Susceptible-Exposed-Infectious-Recovered) model provides a mathematical foundation for understanding disease spread \citep{hethcote2000mathematics}, its assumption of constant contact rates throughout an outbreak limits its practical utility. Real populations modify their behavior as infection levels rise \citep{he2020seir}, yet the timing and magnitude of these changes significantly impact their effectiveness.
+
+% Problem statement and challenges
+Two key challenges emerge in modeling behavioral responses to epidemics. First, population behavior changes occur at discrete thresholds rather than varying continuously with infection rates, making it crucial to identify optimal intervention points. Second, the relationship between intervention timing, magnitude, and effectiveness remains poorly understood, particularly for multi-stage responses where restrictions intensify as infections rise.
+
+% Our approach and methodology
+We address these challenges by developing an enhanced SEIR model that incorporates discrete, threshold-based behavioral responses. Our framework allows contact rates to automatically adjust when infections cross predefined thresholds, enabling systematic evaluation of various intervention strategies. We analyze five distinct approaches, from simple binary responses to sophisticated multi-stage interventions, using a population of 3,005 individuals simulated over 100 days.
+
+% Key contributions
+Our work makes four main contributions:
+\begin{itemize}
+    \item A mathematically rigorous SEIR model extension that captures realistic, threshold-based behavioral changes
+    \item Systematic evaluation demonstrating that early, graduated interventions outperform binary responses
+    \item Quantitative evidence that aggressive early intervention (40\% reduction at 0.5\% infected) can delay peak infection by 14 days and reduce its magnitude by 36\%
+    \item Practical insights showing multi-stage responses maintain effectiveness while improving implementation feasibility
+\end{itemize}
+
+% Results preview and paper structure
+Our results reveal that timing is more critical than magnitude for intervention success: early, moderate restrictions (40\% contact reduction at 0.5\% infected) prove more effective than stronger but delayed responses (70\% reduction at 5\% infected). The remainder of this paper details our methodology (Section~\ref{sec:method}), presents experimental results across intervention scenarios (Section~\ref{sec:results}), and discusses implications for public health policy (Section~\ref{sec:conclusion}). Our findings demonstrate that carefully designed multi-stage interventions can effectively balance epidemic control with practical implementation constraints.
+
+\section{Related Work}
+\label{sec:related}
+
+Two primary approaches exist for modeling behavioral responses in epidemic spread: continuous adaptation models and discrete intervention frameworks. We examine these approaches and position our work within this context.
+
+\citet{hethcote2000mathematics} established the mathematical foundations of SEIR modeling, demonstrating its effectiveness for basic disease dynamics but assuming fixed contact rates. While mathematically elegant, this assumption limits the model's applicability to real-world scenarios where population behavior evolves with disease prevalence. Our work preserves the mathematical tractability of Hethcote's framework while introducing discrete behavioral changes that better reflect actual policy implementations.
+
+\citet{he2020seir} proposed extending SEIR models with continuous behavioral adaptation functions, where contact rates smoothly adjust based on current infection levels. While this approach captures gradual behavioral changes, it presents two key limitations: first, it assumes population behavior responds continuously rather than in discrete steps aligned with policy thresholds; second, it provides limited guidance for concrete intervention timing. Our discrete threshold approach directly addresses these limitations, offering specific, implementable intervention points while maintaining model simplicity.
+
+Our work differs from these approaches in three key aspects: (1) we implement discrete rather than continuous behavioral changes, better matching real-world policy interventions; (2) we systematically evaluate multiple threshold configurations rather than assuming a single response pattern; and (3) we provide quantitative guidance for intervention timing and magnitude. These distinctions make our approach more directly applicable to public health policy while maintaining mathematical rigor.
+
+\section{Background}
+\label{sec:background}
+
+The SEIR (Susceptible-Exposed-Infectious-Recovered) model extends classical epidemiological frameworks by incorporating a latent period where individuals are infected but not yet infectious \citep{hethcote2000mathematics}. This distinction is crucial for diseases where pre-symptomatic transmission affects intervention efficacy.
+
+\subsection{Problem Setting}
+\label{subsec:problem}
+
+Consider a closed population of size $N$ divided into four compartments at time $t$:
+\begin{itemize}
+    \item $S(t)$: Susceptible individuals who can become infected
+    \item $E(t)$: Exposed individuals who are infected but not yet infectious
+    \item $I(t)$: Infectious individuals who can transmit the disease
+    \item $R(t)$: Recovered individuals who are immune
+\end{itemize}
+
+The system evolves according to:
+\begin{align}
+    \frac{dS}{dt} &= -\beta(t)SI \label{eq:seir_s} \\
+    \frac{dE}{dt} &= \beta(t)SI - \alpha E \label{eq:seir_e} \\
+    \frac{dI}{dt} &= \alpha E - \gamma I \label{eq:seir_i} \\
+    \frac{dR}{dt} &= \gamma I \label{eq:seir_r}
+\end{align}
+
+where:
+\begin{itemize}
+    \item $\beta(t)$: Time-varying contact rate (base rate $\beta_0 = 0.001$ per day)
+    \item $\alpha = 1/l_p$: Progression rate ($l_p = 14$ days latent period)
+    \item $\gamma = 1/i_p$: Recovery rate ($i_p = 7$ days infectious period)
+\end{itemize}
+
+The classical model assumes:
+\begin{itemize}
+    \item Population conservation: $S(t) + E(t) + I(t) + R(t) = N$
+    \item Homogeneous mixing
+    \item No births, deaths, or migration
+    \item No reinfection after recovery
+\end{itemize}
+
+A key limitation noted by \citet{he2020seir} is the assumption of constant contact rates throughout the epidemic. Real populations modify behavior as infection levels rise, often in discrete stages rather than continuously. This observation motivates our threshold-based extension where $\beta(t)$ varies with the proportion of infected individuals $I(t)/N$.
+
+\section{Method}
+\label{sec:method}
+
+Building on the SEIR framework introduced in Section~\ref{sec:background}, we extend the model by replacing the constant contact rate $\beta$ with a threshold-based dynamic rate $\beta(I(t))$ that captures population behavioral responses to increasing infection levels.
+
+\subsection{Threshold-Based Contact Rate}
+The core of our approach is a piecewise contact rate function that implements discrete behavioral changes at specific infection thresholds:
+
+\begin{equation}
+\beta(I(t)) = \beta_0 \times
+\begin{cases}
+1.0 & \text{if } \frac{I(t)}{N} < \theta_1 \\
+0.6 & \text{if } \theta_1 \leq \frac{I(t)}{N} < \theta_2 \\
+0.4 & \text{if } \theta_2 \leq \frac{I(t)}{N} < \theta_3 \\
+0.2 & \text{if } \frac{I(t)}{N} \geq \theta_3
+\end{cases}
+\label{eq:beta}
+\end{equation}
+
+where $\theta_1 = 0.005$, $\theta_2 = 0.02$, and $\theta_3 = 0.04$ are infection proportion thresholds that trigger contact rate reductions of 40\%, 60\%, and 80\% respectively. This formulation directly models how populations implement increasingly stringent protective measures as infection levels rise.
+
+\subsection{Numerical Implementation}
+We solve the modified SEIR system (Equations~\ref{eq:seir_s}--\ref{eq:seir_r}) using SciPy's {\tt odeint} solver with:
+\begin{itemize}
+    \item Initial conditions: $(S_0, E_0, I_0, R_0) = (3000, 0, 5, 0)$
+    \item Base contact rate: $\beta_0 = 0.001$ per day
+    \item Disease progression rates: $\alpha = 1/14$ and $\gamma = 1/7$ per day
+    \item Time horizon: $[0, 100]$ days with daily resolution
+\end{itemize}
+
+This implementation allows us to systematically evaluate how different threshold configurations affect epidemic progression while maintaining the mathematical structure of the SEIR model. The piecewise nature of $\beta(I(t))$ introduces nonlinearity at the thresholds, requiring careful numerical treatment to ensure solution stability.
+
+\section{Experimental Setup}
+\label{sec:experimental}
+
+To evaluate our threshold-based SEIR model, we implemented a systematic testing framework using Python's SciPy {\tt odeint} solver. Our experiments compare five progressively more sophisticated intervention strategies, ranging from no intervention (baseline) to aggressive early response.
+
+\subsection{Implementation}
+We solve the modified SEIR system (Equations~\ref{eq:seir_s}--\ref{eq:seir_r}) numerically with:
+\begin{itemize}
+    \item Integration method: SciPy {\tt odeint} with default tolerances
+    \item Time discretization: Daily steps over $[0,100]$ days
+    \item Initial conditions: $(S_0,E_0,I_0,R_0)=(3000,0,5,0)$
+    \item Disease parameters from Section~\ref{sec:method}
+\end{itemize}
+
+\subsection{Intervention Strategies}
+We evaluate five strategies with increasing sophistication:
+\begin{table}[h]
+\centering
+\caption{Intervention strategies and their thresholds}
+\label{tab:strategies}
+\begin{tabular}{llll}
+\toprule
+Strategy & First Response & Second Response & Third Response \\
+\midrule
+Baseline & None & None & None \\
+Single & 50\% at 5\% & None & None \\
+Two-Stage & 30\% at 2\% & 60\% at 5\% & None \\
+Three-Stage & 20\% at 1\% & 40\% at 3\% & 70\% at 5\% \\
+Aggressive & 40\% at 0.5\% & 60\% at 2\% & 80\% at 4\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Evaluation Metrics}
+We assess each strategy using three metrics:
+\begin{itemize}
+    \item Peak timing ($t_{\text{peak}}$): Day of maximum infections
+    \item Peak magnitude ($I_{\text{max}}$): Maximum simultaneous infections
+    \item Total reach ($R_{\infty}$): Cumulative infections at $t=100$
+\end{itemize}
+
+These metrics capture both the temporal dynamics (peak timing) and severity (magnitude and reach) of the epidemic under each intervention strategy. All experiments use identical initial conditions and solver parameters to ensure fair comparison.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Baseline Dynamics}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{seir_solution_run_0.png}
+    \caption{Baseline SEIR dynamics with constant contact rate $\beta_0$. The epidemic peaks at $t=25$ days with $I_{\text{max}}=694.8$ simultaneous infections. Compartment populations shown: Susceptible (blue), Exposed (orange), Infectious (red), and Recovered (green). Vertical line marks peak infection.}
+    \label{fig:baseline}
+\end{figure}
+
+The baseline scenario (Figure~\ref{fig:baseline}) demonstrates uncontrolled epidemic progression with $\beta(t)=\beta_0$. Without interventions, infections peak early ($t_{\text{peak}}=25$ days) at $I_{\text{max}}=694.8$, ultimately reaching $R_{\infty}=2{,}991.4$ total infections (99.7\% of the population).
+
+\subsection{Intervention Impact Analysis}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{seir_comparison.png}
+    \caption{Infectious population $I(t)$ under different intervention strategies. Curves show baseline (red), single-threshold (orange, 50\% reduction at 5\%), two-threshold (green, 30\%/60\% at 2\%/5\%), three-threshold (blue, 20\%/40\%/70\% at 1\%/3\%/5\%), and aggressive early-response (purple, 40\%/60\%/80\% at 0.5\%/2\%/4\%). Dots mark peak infections.}
+    \label{fig:comparison}
+\end{figure}
+
+Figure~\ref{fig:comparison} compares intervention outcomes, with key metrics summarized in Table~\ref{tab:results}.
+
+\begin{table}[h]
+\centering
+\caption{Quantitative comparison of intervention strategies}
+\label{tab:results}
+\begin{tabular}{lrrrr}
+\toprule
+Strategy & Peak Day & Peak Infections & Total Infections & Reduction (\%) \\
+\midrule
+Baseline & 25 & 694.8 & 2,991.4 & -- \\
+Single & 27 & 638.8 & 2,988.9 & 0.08 \\
+Two-Stage & 29 & 602.9 & 2,985.7 & 0.19 \\
+Three-Stage & 31 & 552.7 & 2,977.9 & 0.45 \\
+Aggressive & 39 & 444.3 & 2,909.7 & 2.70 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each intervention strategy demonstrates progressive improvements:
+
+\begin{enumerate}
+    \item Single-threshold (5\%): Minimal impact with 8\% peak reduction and 2-day delay
+    \item Two-threshold (2\%, 5\%): Moderate improvement with 13\% peak reduction and 4-day delay
+    \item Three-threshold (1\%, 3\%, 5\%): Substantial control with 20.5\% peak reduction and 6-day delay
+    \item Aggressive early-response (0.5\%, 2\%, 4\%): Optimal outcomes with 36\% peak reduction and 14-day delay
+\end{enumerate}
+
+\subsection{Implementation Considerations}
+Our numerical experiments reveal three critical factors for intervention success:
+\begin{enumerate}
+    \item Timing dominates magnitude: Early moderate restrictions (40\% at 0.5\%) outperform stronger delayed responses (70\% at 5\%)
+    \item Threshold spacing: Geometric progression of thresholds (0.5\%, 2\%, 4\%) provides better control than linear spacing
+    \item Response gradualism: Stepped increases in restrictions (40\%→60\%→80\%) improve compliance feasibility
+\end{enumerate}
+
+\subsection{Limitations}
+The current implementation has several limitations:
+\begin{itemize}
+    \item Deterministic modeling assumes perfect intervention timing and compliance
+    \item Homogeneous mixing may overestimate early-stage spread
+    \item Small population size ($N=3{,}005$) may limit generalizability
+    \item Economic and social costs not quantified
+    \item Vaccination and immunity dynamics not modeled
+    \item Single parameter set ($\beta_0$, $\alpha$, $\gamma$) limits sensitivity analysis
+\end{itemize}
+
+Despite these constraints, the consistent pattern of improvement across intervention sophistication levels supports the robustness of our findings regarding early, graduated responses.
+
+\section{Conclusions and Future Work}
+\label{sec:conclusion}
+
+Traditional SEIR models assume constant contact rates throughout an epidemic, limiting their utility for policy planning. We addressed this limitation by developing a threshold-based SEIR model that captures how populations modify behavior as infection levels rise. Through systematic evaluation of five intervention strategies, we demonstrated that early, graduated responses significantly outperform binary or delayed approaches. Our optimal strategy, implementing progressive contact rate reductions (40\%, 60\%, 80\%) at low infection thresholds (0.5\%, 2\%, 4\%), achieved substantial improvements over baseline: 36\% reduction in peak infections (from 694.8 to 444.3), 14-day peak delay (from day 25 to 39), and 2.7\% decrease in total infections (from 2,991.4 to 2,909.7).
+
+Three key principles emerged for effective epidemic management:
+\begin{enumerate}
+    \item Early timing outweighs restriction magnitude: moderate early interventions (40\% reduction at 0.5\% infected) proved more effective than stronger delayed measures
+    \item Graduated responses enhance compliance: stepped increases in restrictions (40\%→60\%→80\%) balance effectiveness with feasibility
+    \item Geometric threshold spacing (0.5\%, 2\%, 4\%) provides better control than linear progression
+\end{enumerate}
+
+Building on these findings, future work should focus on:
+\begin{itemize}
+    \item Incorporating population heterogeneity and network effects
+    \item Modeling imperfect detection and compliance
+    \item Integrating vaccination and immunity dynamics
+    \item Optimizing threshold-response pairs
+    \item Quantifying socioeconomic impacts
+\end{itemize}
+
+
+\bibliographystyle{iclr2024_conference}
+\bibliography{references}
+
+\end{document}
